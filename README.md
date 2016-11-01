@@ -6,7 +6,7 @@ Create a menu for a Microsoft Windows Openframeworks application.
 
 1. Add "ofxWinMenu.h" and "ofxWinMenu.cpp" to your Visual Studio project.
 
-In the Visual Studio project properties :
+2. In the Visual Studio project properties :
 
 - Add "ofxWinMenu/src" to additional "C/C++/General/Additional Include Directories"
 - Add "#include ofxWinMenu.h" to the ofApp header file
@@ -78,6 +78,10 @@ Allows the automatic checking to be disabled. This might be necessary where the 
     bool AddPopupSeparator(HMENU hSubMenu);
 
 Adds a separator between popup menu items. This cannot be selected and has no effect on the menu function other than providing spacing from other items, such as the Exit option.
+
+    bool SetPopupItem(string ItemName, bool bChecked);
+    
+Set the menu checkmark of a popup item. This is necessary if the state flag being tested is changed from within ofApp instead of the menu.
 
     bool SetWindowMenu();
 
