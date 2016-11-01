@@ -61,7 +61,7 @@ Creates the menu that will be filled with menu items and returns a handle to it.
 
     HMENU AddPopupMenu(HMENU hMenu, string menuName);
 
-Adds a popup menu which will apear on the menu bar and returns it's handle.
+Adds a popup menu which will appear on the menu bar and returns it's handle.
 
     bool AddPopupItem(HMENU hSubMenu, string ItemName);
 
@@ -81,7 +81,7 @@ Adds a separator between popup menu items. This cannot be selected and has no ef
 
     bool SetWindowMenu();
 
-When all popup menus and items have been added, this finalises the menu and sets it to the application window. It is also used if RemoveWindowMenu has been used.
+When all popup menus and items have been added, this finalises the menu and sets it to the application window. It is also used with RemoveWindowMenu, as in the full screen example.
 
     bool RemoveWindowMenu();
 
@@ -95,10 +95,11 @@ Destroys the menu if this is necessary while the application is running, for exa
 
 The advanced example includes an About dialog, Version information and a custom modeless dialog with controls. See resource.h and resource.rc. 
 
-Examine resource.h to modify version information.
+Examine resource.rc to modify version information.
 
-resource.rc can be modified using a resource editor such as [ResEdit](http://www.resedit.net) or by Microsoft Visual Studio. If the edition of Visual Studio does not include resource editing, RH click on resource.rc, "Open with" and "C++ source code editor".
-The Dialog procedures AboutDlgProc and OptionsDlgProc have to be changed as well to handle any different controls.
+resource.rc can be modified using a resource editor such as [ResEdit](http://www.resedit.net) or by Microsoft Visual Studio or with the source code editor. If the edition of Visual Studio does not include resource editing, RH click on resource.rc, "Open with" and "C++ source code editor".
+
+The Dialog procedures AboutDlgProc and OptionsDlgProc have to be changed to handle any additional controls.
 
 Resedit may include "richedit.h" to resource.rc. This can be removed if it causes warning RC4011.
 
