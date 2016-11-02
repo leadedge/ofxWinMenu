@@ -301,17 +301,12 @@ void ofApp::doFullScreen(bool bFull)
 	else { 
 		// return from full screen
 		ofSetFullscreen(false);
-		// Centre on the screen
-		ofSetWindowPosition((ofGetScreenWidth()-ofGetWidth())/2, (ofGetScreenHeight()-ofGetHeight())/2);
 		// Restore the menu
 		menu->SetWindowMenu();
 		// Restore the window size allowing for the menu
 		ofSetWindowShape(windowWidth, windowHeight + GetSystemMetrics(SM_CYMENU)); 
-		// Repaint the entire desktop to avoid black parts
-		RECT rect;
-		GetClientRect(GetDesktopWindow(), &rect);
-		RedrawWindow(GetDesktopWindow(), &rect, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_ALLCHILDREN);
-		// Show the cursor again
+		// Centre on the screen
+		ofSetWindowPosition((ofGetScreenWidth()-ofGetWidth())/2, (ofGetScreenHeight()-ofGetHeight())/2);
 		ofShowCursor();
 		// Restore topmost state
 		if(bTopmost) doTopmost(true);

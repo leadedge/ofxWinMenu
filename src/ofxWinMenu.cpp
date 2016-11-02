@@ -1,8 +1,31 @@
-//
-//		ofxWinMenu
-//
-//
+/*
 
+	ofxWinMenu
+
+	Create a menu for a Microsoft Windows Openframeworks application.
+	
+	Copyright (C) 2016 Lynn Jarvis.
+
+	https://github.com/leadedge
+
+	http://www.spout.zeal.co
+
+    =========================================================================
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    =========================================================================
+
+*/
 #include "ofApp.h"
 #include "ofxWinMenu.h"
 
@@ -167,27 +190,21 @@ bool ofxWinMenu::SetPopupItem(string ItemName, bool bChecked)
 {
 	if(g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
 
-	// printf("SetPopupItem(%s. %d)\n", ItemName.c_str(), bChecked);
 	int nItems = itemIDs.size();
-	// printf("%d items\n", nItems);
 	if(nItems > 0) {
 		// Find the item number
 		for(int i=0; i<nItems; i++) {
-			// printf("%s\n", itemNames.at(i).c_str());
 			if(ItemName == itemNames.at(i)) {
-				// printf("Match at %d\n", i);
 				// Which popup menu is the item in
 				HMENU hSubMenu = subMenus.at(i);
 				if(hSubMenu) {
 					// How many items in the submenu
 					int nPopupItems = GetMenuItemCount(hSubMenu);
-					// printf("%d popup items\n", nPopupItems);
 					// Loop through the popup items to find a match
 					if(nPopupItems > 0) {
 						char itemstring[MAX_PATH];
 						for(int j=0; j<nPopupItems; j++) {
 							GetMenuStringA(hSubMenu, j, (LPSTR)itemstring, MAX_PATH, MF_BYPOSITION);
-							// printf("  %s\n", itemstring);
 							if(ItemName == itemstring) {
 								if(bChecked)
 									CheckMenuItem(hSubMenu, j, MF_BYPOSITION | MF_CHECKED);

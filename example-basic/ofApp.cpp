@@ -6,10 +6,12 @@
 	
 	Copyright (C) 2016 Lynn Jarvis.
 
+	https://github.com/leadedge
+
 	http://www.spout.zeal.co
 
-	=========================================================================
-	This program is free software: you can redistribute it and/or modify
+    =========================================================================
+    This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
@@ -21,7 +23,7 @@
 
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	=========================================================================
+    =========================================================================
 
 */
 #include "ofApp.h"
@@ -231,16 +233,12 @@ void ofApp::doFullScreen(bool bFull)
 	else { 
 		// return from full screen
 		ofSetFullscreen(false);
-		// Centre on the screen
-		ofSetWindowPosition((ofGetScreenWidth()-ofGetWidth())/2, (ofGetScreenHeight()-ofGetHeight())/2);
 		// Restore the menu
 		menu->SetWindowMenu();
 		// Restore the window size allowing for the menu
 		ofSetWindowShape(windowWidth, windowHeight + GetSystemMetrics(SM_CYMENU)); 
-		// Repaint the entire desktop to avoid black parts
-		RECT rect;
-		GetClientRect(GetDesktopWindow(), &rect);
-		RedrawWindow(GetDesktopWindow(), &rect, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_ALLCHILDREN);
+		// Centre on the screen
+		ofSetWindowPosition((ofGetScreenWidth()-ofGetWidth())/2, (ofGetScreenHeight()-ofGetHeight())/2);
 		// Show the cursor again
 		ofShowCursor();
 		// Restore topmost state
