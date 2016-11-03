@@ -25,6 +25,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 
+	03.11.16 - minor comment cleanup
+
 */
 #include "ofApp.h"
 
@@ -52,7 +54,6 @@ void ofApp::setup() {
 	// Disable escape key exit so we can exit fullscreen with Escape (see keyPressed)
 	ofSetEscapeQuitsApp(false);
 
-
 	//
 	// Create a menu using ofxWinMenu
 	//
@@ -76,6 +77,7 @@ void ofApp::setup() {
 	//
 	// Add popup items to the File menu
 	//
+
 	// Open an image file
 	menu->AddPopupItem(hPopup, "Open", false, false); // Not checked and not auto-checked
 	
@@ -97,12 +99,11 @@ void ofApp::setup() {
 	//
 	hPopup = menu->AddPopupMenu(hMenu, "View");
 
-	// State variables
-	bShowInfo = true;  // screen info display
-	menu->AddPopupItem(hPopup, "Show info", true); // Checked default
+	bShowInfo = true;  // screen info display on
+	menu->AddPopupItem(hPopup, "Show info", true); // Checked
 	bTopmost = false; // app is topmost
 	menu->AddPopupItem(hPopup, "Show on top"); // Not checked (default)
-	bFullscreen = false;
+	bFullscreen = false; // not fullscreen yet
 	menu->AddPopupItem(hPopup, "Full screen", false, false); // Not checked and not auto-check
 
 	//
@@ -215,7 +216,6 @@ void ofApp::draw() {
 		myFont.drawString(str, 15, ofGetHeight()-20);
 	}
 
-
 } // end Draw
 
 
@@ -274,7 +274,7 @@ void ofApp::keyPressed(int key) {
 	
 	// Escape key exit has been disabled but it can be checked here
 	if(key == VK_ESCAPE) {
-		// Exit if fullscreen set, otherwise exit
+		// Disable fullscreen set, otherwise quit the application as usual
 		if(bFullscreen) {
 			bFullscreen = false;
 			doFullScreen(false);
@@ -287,7 +287,7 @@ void ofApp::keyPressed(int key) {
 	// Remove or show screen info
 	if(key == ' ') {
 		bShowInfo = !bShowInfo;
-		// Update the menu check mark because the item state has been changed
+		// Update the menu check mark because the item state has been changed here
 		menu->SetPopupItem("Show info", bShowInfo);
 	}
 
@@ -295,6 +295,7 @@ void ofApp::keyPressed(int key) {
 		bFullscreen = !bFullscreen;	
 		doFullScreen(bFullscreen);
 		// Do not check this menu item
+		// If there is no menu when you call the SetPopupItem function it will crash
 	}
 
 } // end keyPressed
