@@ -25,6 +25,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 
+	17.11.16 - fixed submenu item count in AddPopupSeparator
+			 - fixed submenu item increment in SetPopupItem
+
+
 */
 #include "ofApp.h"
 #include "ofxWinMenu.h"
@@ -52,6 +56,8 @@ ofxWinMenu::ofxWinMenu(ofApp *app) {
 	// Set our own window message procedure
 	SetWindowLongPtrA(g_hwnd, GWL_WNDPROC, (LONG)ofxWinMenuWndProc);
 
+	// Set the Menu name
+	SetClassLongA(g_hwnd, GCL_MENUNAME, (LONG)"ofxWinMenu"); 
 
 }
 
@@ -134,15 +140,21 @@ bool ofxWinMenu::AddPopupSeparator(HMENU hSubMenu)
 {
 	int nItems = 0;
 	HMENU hSubSubMenu = NULL;
+	char name[MAX_PATH];
+
 	if(g_hMenu && hSubMenu) {
-		 // Includes popup submenus
+
+		GetMenuStringA(hSubMenu, 0, (LPSTR)name, MAX_PATH, MF_BYPOSITION);
 		int n = GetMenuItemCount(hSubMenu);
-		 // Allow for one level deep
+
+		// Include popup submenus - allow for one level deep
 		for(int i = 0; i < n; i++) {
 			nItems++;
 			// Is the item a submenu of the popup menu ?
 			hSubSubMenu = GetSubMenu(hSubMenu, i);
 			if(hSubSubMenu) {
+				nItems++; // Include the submenu itself
+				GetMenuStringA(hSubSubMenu, 0, (LPSTR)name, MAX_PATH, MF_BYPOSITION);
 				// Add it's items to the incrementing count as we build the menu
 				nItems += GetMenuItemCount(hSubMenu); 
 			}
@@ -189,7 +201,7 @@ bool ofxWinMenu::DestroyWindowMenu()
 bool ofxWinMenu::SetPopupItem(string ItemName, bool bChecked)
 {
 	if(g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
-
+	
 	int nItems = itemIDs.size();
 	if(nItems > 0) {
 		// Find the item number
@@ -210,7 +222,7 @@ bool ofxWinMenu::SetPopupItem(string ItemName, bool bChecked)
 									CheckMenuItem(hSubMenu, j, MF_BYPOSITION | MF_CHECKED);
 								else
 									CheckMenuItem(hSubMenu, j, MF_BYPOSITION | MF_UNCHECKED);
-								isChecked.at(i+j) = bChecked;
+								isChecked.at(i) = bChecked;
 								return true;
 							}
 						}
