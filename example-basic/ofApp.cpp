@@ -4,7 +4,7 @@
 
 	Example of using ofxWinMenu addon to create a menu for a Microsoft Windows application.
 	
-	Copyright (C) 2016 Lynn Jarvis.
+	Copyright (C) 2016-2017 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -26,6 +26,7 @@
     =========================================================================
 
 	03.11.16 - minor comment cleanup
+	21.02.17 - rebuild for OF 0.9.8
 
 */
 #include "ofApp.h"
@@ -49,7 +50,7 @@ void ofApp::setup() {
 	myImage.loadImage("lighthouse.jpg");
 
 	// Window handle used for topmost function
-	hWnd = GetActiveWindow();
+	hWnd = WindowFromDC(wglGetCurrentDC());
 
 	// Disable escape key exit so we can exit fullscreen with Escape (see keyPressed)
 	ofSetEscapeQuitsApp(false);
@@ -59,7 +60,7 @@ void ofApp::setup() {
 	//
 
 	// A new menu object with a pointer to this class
-	menu = new ofxWinMenu(this);
+	menu = new ofxWinMenu(this, hWnd);
 
 	// Register an ofApp function that is called when a menu item is selected.
 	// The function can be called anything but must exist. 

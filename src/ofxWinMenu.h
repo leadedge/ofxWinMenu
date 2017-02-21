@@ -34,7 +34,7 @@ class ofxWinMenu {
 
 	public:
 
-		ofxWinMenu(ofApp *app);
+		ofxWinMenu(ofApp *app, HWND hwnd);
 		~ofxWinMenu();
 
 		HWND g_hwnd; // ofApp window

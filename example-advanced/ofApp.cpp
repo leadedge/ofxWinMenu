@@ -12,7 +12,7 @@
 
 	The Dialog procedures AboutDlgProc and OptionsDlgProc have to be changed as well.
 
-	Copyright (C) 2016 Lynn Jarvis.
+	Copyright (C) 2016-2017 Lynn Jarvis.
 
 	http://www.spout.zeal.co
 
@@ -30,6 +30,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	=========================================================================
+
+	21.02.17 - rebuild for OF 0.9.8
 
 */
 #include "ofApp.h"
@@ -67,7 +69,7 @@ void ofApp::setup() {
 	hInstance = GetModuleHandle(NULL);
 
 	// Window handle used for resources and topmost function
-	hWnd = GetActiveWindow();
+	hWnd = WindowFromDC(wglGetCurrentDC());
 
 	// Set a custom window icon (see resource.h and resource.rc)
 	SetClassLong(hWnd, GCL_HICON, (LONG)LoadIconA(GetModuleHandle(NULL), MAKEINTRESOURCEA(IDI_ICON1)));
@@ -80,7 +82,7 @@ void ofApp::setup() {
 	//
 
 	// A new menu object with a pointer to this class
-	menu = new ofxWinMenu(this);
+	menu = new ofxWinMenu(this, hWnd);
 
 	// Register an ofApp function that is called when a menu item is selected.
 	// The function can be called anything but must exist. 

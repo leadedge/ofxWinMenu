@@ -27,6 +27,7 @@
 
 	17.11.16 - fixed submenu item count in AddPopupSeparator
 			 - fixed submenu item increment in SetPopupItem
+	21.02.17 - changed constructor to take the window handle
 
 
 */
@@ -39,13 +40,13 @@ static WNDPROC ofAppWndProc; // Openframeworks application window message proced
 static ofxWinMenu *pThis; // Pointer to access the ofxWinMenu class from the window procedure
 
 
-ofxWinMenu::ofxWinMenu(ofApp *app) {
+ofxWinMenu::ofxWinMenu(ofApp *app, HWND hwnd) {
 
 	g_hMenu = NULL; // Set by CreateMenu and returned to ofApp
 	pAppMenuFunction = NULL; // Set by CreateMenuFunction to return menu state to ofApp
 
 	// The window handle of ofApp
-	g_hwnd = GetActiveWindow();
+	g_hwnd = hwnd;
 
 	pThis = this; // Pointer for access the ofxWinMenu class
 	pApp = app; // The ofApp class pointer

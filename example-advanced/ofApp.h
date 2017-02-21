@@ -2,7 +2,7 @@
 
 	ofxWinMenu advanced example - opApp.h
 
-	Copyright (C) 2016 Lynn Jarvis.
+	Copyright (C) 2016-2017 Lynn Jarvis.
 
 	http://www.spout.zeal.co
 
