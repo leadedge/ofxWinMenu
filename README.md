@@ -34,9 +34,9 @@ Also declare a function in ofApp that will receive messages back from ofxWinMenu
   
 The title string and bChecked flag are returned whenever a menu selection is made. The compare the string returned with the menu items that have been added to take action as required.
 
-In ofApp create a new menu object and pass the application class pointer to it.
+In ofApp create a new menu object. Pass the application class pointer and the handle of the application window to attach the menu to it.
 
-    menu = new ofxWinMenu(this);
+    menu = new ofxWinMenu(this, hWnd);
   
 Create the return function
 
