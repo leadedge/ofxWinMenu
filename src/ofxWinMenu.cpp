@@ -28,7 +28,7 @@
 	17.11.16 - fixed submenu item count in AddPopupSeparator
 			 - fixed submenu item increment in SetPopupItem
 	21.02.17 - changed constructor to take the window handle
-
+	23.12.17 - Add WM_ENTERMENULOOP and WM_EXITMENULOOP
 
 */
 #include "ofApp.h"
@@ -266,6 +266,7 @@ LRESULT CALLBACK ofxWinMenuWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 		// Check For Windows system messages
 		case WM_SYSCOMMAND:	
+
 			switch (wParam)	{         // Check System Calls
 				case SC_SCREENSAVE:   // Screensaver Trying To Start?
 				case SC_MONITORPOWER: // Monitor Trying To Enter Powersave?
@@ -273,8 +274,19 @@ LRESULT CALLBACK ofxWinMenuWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			}
 			break;
 
+		case WM_ENTERMENULOOP:
+			// Inform ofApp of menu entry
+			pThis->MenuFunction("WM_ENTERMENULOOP", true);
+			break;
+
+		case WM_EXITMENULOOP :
+			// Inform ofApp of menu exit
+			pThis->MenuFunction("WM_EXITMENULOOP", true);
+			break;
+
 		case WM_COMMAND:
 
+			// Inform ofApp which menu has been selected
 			hSubMenu = pThis->subMenus.at(wmId); // Submenu that the menu item is in
 			ID = pThis->itemIDs.at(wmId); // Position of the item in the submenu
 
