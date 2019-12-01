@@ -28,6 +28,12 @@
 */
 #pragma once
 
+#include <Windows.h>
+#include <string>
+#include <vector>
+
+using namespace std;
+
 class ofApp; // Forward declaration
 
 class ofxWinMenu {

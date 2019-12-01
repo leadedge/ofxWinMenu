@@ -29,9 +29,9 @@
 			 - fixed submenu item increment in SetPopupItem
 	21.02.17 - changed constructor to take the window handle
 	23.12.17 - Add WM_ENTERMENULOOP and WM_EXITMENULOOP
+	29.11.19 - Corrected SetClassLong > SetClassLongPtrA for 64 bits
 
 */
-#include "ofApp.h"
 #include "ofxWinMenu.h"
 
 
@@ -52,13 +52,13 @@ ofxWinMenu::ofxWinMenu(ofApp *app, HWND hwnd) {
 	pApp = app; // The ofApp class pointer
 
 	// Save the Openframeworks application window message procedure
-	ofAppWndProc = (WNDPROC)GetWindowLongPtrA(g_hwnd, GWL_WNDPROC);
+	ofAppWndProc = (WNDPROC)GetWindowLongPtrA(g_hwnd, GWLP_WNDPROC);
 	
 	// Set our own window message procedure
-	SetWindowLongPtrA(g_hwnd, GWL_WNDPROC, (LONG)ofxWinMenuWndProc);
+	SetWindowLongPtrA(g_hwnd, GWLP_WNDPROC, (LONG_PTR)ofxWinMenuWndProc);
 
 	// Set the Menu name
-	SetClassLongA(g_hwnd, GCL_MENUNAME, (LONG)"ofxWinMenu"); 
+	SetClassLongPtrA(g_hwnd, GCLP_MENUNAME, (LONG_PTR)"ofxWinMenu");
 
 }
 
