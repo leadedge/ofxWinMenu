@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016 Lynn Jarvis.
+	Copyright (C) 2016-2020 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -30,6 +30,7 @@
 	21.02.17 - changed constructor to take the window handle
 	23.12.17 - Add WM_ENTERMENULOOP and WM_EXITMENULOOP
 	29.11.19 - Corrected SetClassLong > SetClassLongPtrA for 64 bits
+	19.09.20 - Add EnablePopupItem
 
 */
 #include "ofxWinMenu.h"
@@ -121,7 +122,7 @@ bool ofxWinMenu::AddPopupItem(HMENU hSubMenu, string ItemName, bool bChecked, bo
 {
 	if(g_hMenu && hSubMenu) {
 		int nItem = GetMenuItemCount(hSubMenu);
-		int itemID = itemIDs.size();
+		int itemID = (int)itemIDs.size();
 		itemIDs.push_back(nItem);
 		subMenus.push_back(hSubMenu);
 		itemNames.push_back(ItemName);
@@ -203,7 +204,7 @@ bool ofxWinMenu::SetPopupItem(string ItemName, bool bChecked)
 {
 	if(g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
 	
-	int nItems = itemIDs.size();
+	int nItems = (int)itemIDs.size();
 	if(nItems > 0) {
 		// Find the item number
 		for(int i=0; i<nItems; i++) {
@@ -224,6 +225,42 @@ bool ofxWinMenu::SetPopupItem(string ItemName, bool bChecked)
 								else
 									CheckMenuItem(hSubMenu, j, MF_BYPOSITION | MF_UNCHECKED);
 								isChecked.at(i) = bChecked;
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+// Enable or disable a popup item
+bool ofxWinMenu::EnablePopupItem(string ItemName, bool bEnabled)
+{
+	if (g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
+
+	int nItems = (int)itemIDs.size();
+	if (nItems > 0) {
+		// Find the item number
+		for (int i = 0; i < nItems; i++) {
+			if (ItemName == itemNames.at(i)) {
+				// Which popup menu is the item in
+				HMENU hSubMenu = subMenus.at(i);
+				if (hSubMenu) {
+					// How many items in the submenu
+					int nPopupItems = GetMenuItemCount(hSubMenu);
+					// Loop through the popup items to find a match
+					if (nPopupItems > 0) {
+						char itemstring[MAX_PATH];
+						for (int j = 0; j < nPopupItems; j++) {
+							GetMenuStringA(hSubMenu, j, (LPSTR)itemstring, MAX_PATH, MF_BYPOSITION);
+							if (ItemName == itemstring) {
+								if (bEnabled)
+									EnableMenuItem(hSubMenu, j, MF_ENABLED);
+								else
+									EnableMenuItem(hSubMenu, j, MF_DISABLED);
 								return true;
 							}
 						}

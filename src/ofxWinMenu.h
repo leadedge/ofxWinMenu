@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016 Lynn Jarvis.
+	Copyright (C) 2016-2020 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -69,6 +69,9 @@ class ofxWinMenu {
 
 		// Set the menu checkmark of a popup item
 		bool SetPopupItem(string ItemName, bool bChecked);
+
+		// Enable or disable (grey out) a popup item
+		bool EnablePopupItem(string ItemName, bool bEnabled);
 
 		// Function from ofApp for return of memu item selection
 		void CreateMenuFunction(void(ofApp::*function)(string title, bool bChecked));
