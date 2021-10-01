@@ -169,7 +169,7 @@ bool ofxWinMenu::AddPopupSeparator(HMENU hSubMenu)
 		// The position indicates the menu item before which the new menu item is to be inserted
 		// as determined by the uFlags parameter (MF_BYPOSITION).
 		//
-		return (bool)InsertMenuA(hSubMenu, nItems, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);		return (bool)InsertMenuA(hSubMenu, nItems, MF_SEPARATOR, 0, NULL);
+		return (bool)InsertMenuA(hSubMenu, nItems, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
 	}
 	return false;
 }
