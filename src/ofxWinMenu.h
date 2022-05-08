@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016-2020 Lynn Jarvis.
+	Copyright (C) 2016-2022 Lynn Jarvis.
 
 	https://github.com/leadedge
 

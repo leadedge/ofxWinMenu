@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016-2021 Lynn Jarvis.
+	Copyright (C) 2016-2022 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -32,6 +32,7 @@
 	29.11.19 - Corrected SetClassLong > SetClassLongPtrA for 64 bits
 	19.09.20 - Add EnablePopupItem
 	01.10.21 - Correct AddPopupSeparator to include MF_BYPOSITION
+	07.05.22 - Change EnablePopupItem to use menu item number directly
 
 */
 #include "ofxWinMenu.h"
@@ -249,26 +250,11 @@ bool ofxWinMenu::EnablePopupItem(string ItemName, bool bEnabled)
 		// Find the item number
 		for (int i = 0; i < nItems; i++) {
 			if (ItemName == itemNames.at(i)) {
-				// Which popup menu is the item in
-				HMENU hSubMenu = subMenus.at(i);
-				if (hSubMenu) {
-					// How many items in the submenu
-					int nPopupItems = GetMenuItemCount(hSubMenu);
-					// Loop through the popup items to find a match
-					if (nPopupItems > 0) {
-						char itemstring[MAX_PATH];
-						for (int j = 0; j < nPopupItems; j++) {
-							GetMenuStringA(hSubMenu, j, (LPSTR)itemstring, MAX_PATH, MF_BYPOSITION);
-							if (ItemName == itemstring) {
-								if (bEnabled)
-									EnableMenuItem(hSubMenu, j, MF_ENABLED);
-								else
-									EnableMenuItem(hSubMenu, j, MF_DISABLED);
-								return true;
-							}
-						}
-					}
-				}
+				if (bEnabled)
+					EnableMenuItem(g_hMenu, i, MF_ENABLED);
+				else
+					EnableMenuItem(g_hMenu, i, MF_DISABLED);
+				return true;
 			}
 		}
 	}
