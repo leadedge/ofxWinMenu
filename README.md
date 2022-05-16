@@ -115,7 +115,7 @@ Binaries are included to illustrate the function of ofxWinMenu before building t
 
 ### Copyright
 
-ofxWinMenu - Copyright (C) 2016 Lynn Jarvis [http://spout.zeal.co/](http://spout.zeal.co/)
+ofxWinMenu - Copyright (C) 2016-2022 Lynn Jarvis [http://spout.zeal.co/](http://spout.zeal.co/)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser  General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
