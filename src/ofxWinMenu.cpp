@@ -33,6 +33,9 @@
 	19.09.20 - Add EnablePopupItem
 	01.10.21 - Correct AddPopupSeparator to include MF_BYPOSITION
 	07.05.22 - Change EnablePopupItem to use menu item number directly
+	30.06.22 - Correct AddPopupItem to allow check if not autocheck
+			 - Remove using namespace std and use std:: throughout
+			 - Add SetPopupItemName to change a menu item name
 
 */
 #include "ofxWinMenu.h"
@@ -89,7 +92,7 @@ HMENU ofxWinMenu::CreateWindowMenu()
 }
 
 // Popup menu of the main menu
-HMENU ofxWinMenu::AddPopupMenu(HMENU hMenu, string MenuName)
+HMENU ofxWinMenu::AddPopupMenu(HMENU hMenu, std::string MenuName)
 {
 	if(hMenu) {
 		HMENU hSubMenu = CreatePopupMenu();
@@ -110,17 +113,17 @@ HMENU ofxWinMenu::AddPopupMenu(HMENU hMenu, string MenuName)
 //     bChecked   - initial state of the menu item, checked or not
 //     bAutoCheck - Check the item on or off automatically on selection
 //
-bool ofxWinMenu::AddPopupItem(HMENU hSubMenu, string ItemName)
+bool ofxWinMenu::AddPopupItem(HMENU hSubMenu, std::string ItemName)
 {
 	return AddPopupItem(hSubMenu, ItemName, false, true);
 }
 
-bool ofxWinMenu::AddPopupItem(HMENU hSubMenu, string ItemName, bool bChecked)
+bool ofxWinMenu::AddPopupItem(HMENU hSubMenu, std::string ItemName, bool bChecked)
 {
 	return AddPopupItem(hSubMenu, ItemName, bChecked, true);
 }
 
-bool ofxWinMenu::AddPopupItem(HMENU hSubMenu, string ItemName, bool bChecked, bool bAutoCheck)
+bool ofxWinMenu::AddPopupItem(HMENU hSubMenu, std::string ItemName, bool bChecked, bool bAutoCheck)
 {
 	if(g_hMenu && hSubMenu) {
 		int nItem = GetMenuItemCount(hSubMenu);
@@ -131,7 +134,7 @@ bool ofxWinMenu::AddPopupItem(HMENU hSubMenu, string ItemName, bool bChecked, bo
 		isChecked.push_back(bChecked);
 		autoCheck.push_back(bAutoCheck);
 		if(InsertMenuA(hSubMenu, nItem, MF_BYPOSITION, itemID, ItemName.c_str())) {
-			if(bAutoCheck && bChecked) 
+			if (bChecked)
 				CheckMenuItem(hSubMenu, nItem, MF_BYPOSITION | MF_CHECKED);
 			return true;
 		}
@@ -204,10 +207,10 @@ bool ofxWinMenu::DestroyWindowMenu()
 
 
 // Check or uncheck a menu item
-bool ofxWinMenu::SetPopupItem(string ItemName, bool bChecked)
+bool ofxWinMenu::SetPopupItem(std::string ItemName, bool bChecked)
 {
 	if(g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
-	
+
 	int nItems = (int)itemIDs.size();
 	if(nItems > 0) {
 		// Find the item number
@@ -240,8 +243,54 @@ bool ofxWinMenu::SetPopupItem(string ItemName, bool bChecked)
 	return false;
 }
 
+
+// Change the name of a menu item
+bool ofxWinMenu::SetPopupItemName(std::string ItemName, std::string NewName)
+{
+	if (g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
+
+	int nItems = (int)itemIDs.size();
+	if (nItems > 0) {
+		// Find the item number
+		for (int i=0; i<nItems; i++) {
+			if (ItemName == itemNames.at(i)) {
+				// Which popup menu is the item in
+				HMENU hSubMenu = subMenus.at(i);
+				if (hSubMenu) {
+					// How many items in the submenu
+					int nPopupItems = GetMenuItemCount(hSubMenu);
+					// Loop through the popup items to find a match
+					if (nPopupItems > 0) {
+						char itemstring[MAX_PATH];
+						for (int j=0; j<nPopupItems; j++) {
+							GetMenuStringA(hSubMenu, j, (LPSTR)itemstring, MAX_PATH, MF_BYPOSITION);
+							if (ItemName == itemstring) {
+								// Get the item info
+								MENUITEMINFOA menuitem = {sizeof(MENUITEMINFOA)};
+								char tmp[256];
+								menuitem.fMask = MIIM_TYPE | MIIM_SUBMENU;
+								menuitem.dwTypeData = (char *)tmp;
+								menuitem.cch = _countof(tmp);
+								GetMenuItemInfoA(hSubMenu, j, true, &menuitem);
+								// Set the new name
+								menuitem.dwTypeData = (LPSTR)NewName.c_str();
+								SetMenuItemInfoA(hSubMenu, j, true, &menuitem);
+								// Save the new item name
+								itemNames[i] = NewName;
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+
 // Enable or disable a popup item
-bool ofxWinMenu::EnablePopupItem(string ItemName, bool bEnabled)
+bool ofxWinMenu::EnablePopupItem(std::string ItemName, bool bEnabled)
 {
 	if (g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
 
@@ -263,14 +312,14 @@ bool ofxWinMenu::EnablePopupItem(string ItemName, bool bEnabled)
 
 
 // ofApp Function for return of memu item selection
-void ofxWinMenu::CreateMenuFunction(void(ofApp::*function)(string title, bool bChecked))
+void ofxWinMenu::CreateMenuFunction(void(ofApp::*function)(std::string title, bool bChecked))
 {
 	pAppMenuFunction = function; // Return function in ofApp
 }
 
 // Pass back the menu item title and state to ofApp
 // by calling the function set by "CreateMenuFunction"
-void ofxWinMenu::MenuFunction(string title, bool bChecked)
+void ofxWinMenu::MenuFunction(std::string title, bool bChecked)
 {
 	(pApp->*pAppMenuFunction)(title, bChecked); 
 }
