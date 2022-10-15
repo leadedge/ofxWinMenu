@@ -36,6 +36,7 @@
 	30.06.22 - Correct AddPopupItem to allow check if not autocheck
 			 - Remove using namespace std and use std:: throughout
 			 - Add SetPopupItemName to change a menu item name
+	15.10.22 - Add GetPopupItem to return checked state or existence
 
 */
 #include "ofxWinMenu.h"
@@ -243,8 +244,43 @@ bool ofxWinMenu::SetPopupItem(std::string ItemName, bool bChecked)
 	return false;
 }
 
+// Return 0 (not checked), 1 (checked), -1 (does not exist)
+int ofxWinMenu::GetPopupItem(std::string ItemName)
+{
+	if (g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return -1;
 
-// Change the name of a menu item
+	int nItems = (int)itemIDs.size();
+	if (nItems > 0) {
+		// Find the item number
+		for (int i=0; i<nItems; i++) {
+			if (ItemName == itemNames.at(i)) {
+				// Which popup menu is the item in
+				HMENU hSubMenu = subMenus.at(i);
+				if (hSubMenu) {
+					// How many items in the submenu
+					int nPopupItems = GetMenuItemCount(hSubMenu);
+					// Loop through the popup items to find a match
+					if (nPopupItems > 0) {
+						char itemstring[MAX_PATH];
+						for (int j=0; j<nPopupItems; j++) {
+							GetMenuStringA(hSubMenu, j, (LPSTR)itemstring, MAX_PATH, MF_BYPOSITION);
+							if (ItemName == itemstring) {
+								if (isChecked.at(i))
+									return 1; // checked
+								else
+									return 0; // not checked
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	// Does not exist
+	return -1;
+}
+
+// Change the name of a popup item
 bool ofxWinMenu::SetPopupItemName(std::string ItemName, std::string NewName)
 {
 	if (g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;

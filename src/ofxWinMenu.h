@@ -68,7 +68,9 @@ class ofxWinMenu {
 		// Set the menu checkmark of a popup item
 		bool SetPopupItem(std::string ItemName, bool bChecked);
 
-		// LJ DEBUG
+		// Return 0 (not checked), 1 (checked), -1 (does not exist)
+		int GetPopupItem(std::string ItemName);
+
 		// Change the name of a popup item
 		bool SetPopupItemName(std::string ItemName, std::string NewName);
 
