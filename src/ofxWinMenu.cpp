@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016-2022 Lynn Jarvis.
+	Copyright (C) 2016-2023 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -37,6 +37,7 @@
 			 - Remove using namespace std and use std:: throughout
 			 - Add SetPopupItemName to change a menu item name
 	15.10.22 - Add GetPopupItem to return checked state or existence
+	21.12.22 - Add WM_NCLBUTTONDOWN
 
 */
 #include "ofxWinMenu.h"
@@ -383,6 +384,11 @@ LRESULT CALLBACK ofxWinMenuWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				case SC_MONITORPOWER: // Monitor Trying To Enter Powersave?
 				return 0;             // Prevent From Happening
 			}
+			break;
+
+		case WM_NCLBUTTONDOWN:
+			// Inform ofApp of click outside client area
+			pThis->MenuFunction("WM_NCLBUTTONDOWN", true);
 			break;
 
 		case WM_ENTERMENULOOP:
