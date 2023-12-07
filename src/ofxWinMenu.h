@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016-2023 Lynn Jarvis.
+	Copyright (C) 2016-2024 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -56,6 +56,8 @@ class ofxWinMenu {
 		bool AddPopupItem(HMENU hSubMenu, std::string ItemName, bool bChecked, bool bAutoCheck);
 		bool AddPopupSeparator(HMENU hSubMenu);
 
+
+
 		// Set the menu to the application
 		bool SetWindowMenu();
 
@@ -67,12 +69,6 @@ class ofxWinMenu {
 
 		// Set the menu checkmark of a popup item
 		bool SetPopupItem(std::string ItemName, bool bChecked);
-
-		// Return 0 (not checked), 1 (checked), -1 (does not exist)
-		int GetPopupItem(std::string ItemName);
-
-		// Change the name of a popup item
-		bool SetPopupItemName(std::string ItemName, std::string NewName);
 
 		// Enable or disable (grey out) a popup item
 		bool EnablePopupItem(std::string ItemName, bool bEnabled);

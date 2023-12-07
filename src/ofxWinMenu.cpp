@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016-2023 Lynn Jarvis.
+	Copyright (C) 2016-2024 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -33,20 +33,14 @@
 	19.09.20 - Add EnablePopupItem
 	01.10.21 - Correct AddPopupSeparator to include MF_BYPOSITION
 	07.05.22 - Change EnablePopupItem to use menu item number directly
-	30.06.22 - Correct AddPopupItem to allow check if not autocheck
-			 - Remove using namespace std and use std:: throughout
-			 - Add SetPopupItemName to change a menu item name
-	15.10.22 - Add GetPopupItem to return checked state or existence
-	21.12.22 - Add WM_NCLBUTTONDOWN
+	07.12.23 - used std:: thoughout instead of depending on "using namespave std"
 
 */
 #include "ofxWinMenu.h"
 
-
 static LRESULT CALLBACK ofxWinMenuWndProc(HWND, UINT, WPARAM, LPARAM); // Local window message procedure
 static WNDPROC ofAppWndProc; // Openframeworks application window message procedure
 static ofxWinMenu *pThis; // Pointer to access the ofxWinMenu class from the window procedure
-
 
 ofxWinMenu::ofxWinMenu(ofApp *app, HWND hwnd) {
 
@@ -136,7 +130,7 @@ bool ofxWinMenu::AddPopupItem(HMENU hSubMenu, std::string ItemName, bool bChecke
 		isChecked.push_back(bChecked);
 		autoCheck.push_back(bAutoCheck);
 		if(InsertMenuA(hSubMenu, nItem, MF_BYPOSITION, itemID, ItemName.c_str())) {
-			if (bChecked)
+			if(bAutoCheck && bChecked) 
 				CheckMenuItem(hSubMenu, nItem, MF_BYPOSITION | MF_CHECKED);
 			return true;
 		}
@@ -212,7 +206,7 @@ bool ofxWinMenu::DestroyWindowMenu()
 bool ofxWinMenu::SetPopupItem(std::string ItemName, bool bChecked)
 {
 	if(g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
-
+	
 	int nItems = (int)itemIDs.size();
 	if(nItems > 0) {
 		// Find the item number
@@ -244,87 +238,6 @@ bool ofxWinMenu::SetPopupItem(std::string ItemName, bool bChecked)
 	}
 	return false;
 }
-
-// Return 0 (not checked), 1 (checked), -1 (does not exist)
-int ofxWinMenu::GetPopupItem(std::string ItemName)
-{
-	if (g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return -1;
-
-	int nItems = (int)itemIDs.size();
-	if (nItems > 0) {
-		// Find the item number
-		for (int i=0; i<nItems; i++) {
-			if (ItemName == itemNames.at(i)) {
-				// Which popup menu is the item in
-				HMENU hSubMenu = subMenus.at(i);
-				if (hSubMenu) {
-					// How many items in the submenu
-					int nPopupItems = GetMenuItemCount(hSubMenu);
-					// Loop through the popup items to find a match
-					if (nPopupItems > 0) {
-						char itemstring[MAX_PATH];
-						for (int j=0; j<nPopupItems; j++) {
-							GetMenuStringA(hSubMenu, j, (LPSTR)itemstring, MAX_PATH, MF_BYPOSITION);
-							if (ItemName == itemstring) {
-								if (isChecked.at(i))
-									return 1; // checked
-								else
-									return 0; // not checked
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	// Does not exist
-	return -1;
-}
-
-// Change the name of a popup item
-bool ofxWinMenu::SetPopupItemName(std::string ItemName, std::string NewName)
-{
-	if (g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
-
-	int nItems = (int)itemIDs.size();
-	if (nItems > 0) {
-		// Find the item number
-		for (int i=0; i<nItems; i++) {
-			if (ItemName == itemNames.at(i)) {
-				// Which popup menu is the item in
-				HMENU hSubMenu = subMenus.at(i);
-				if (hSubMenu) {
-					// How many items in the submenu
-					int nPopupItems = GetMenuItemCount(hSubMenu);
-					// Loop through the popup items to find a match
-					if (nPopupItems > 0) {
-						char itemstring[MAX_PATH];
-						for (int j=0; j<nPopupItems; j++) {
-							GetMenuStringA(hSubMenu, j, (LPSTR)itemstring, MAX_PATH, MF_BYPOSITION);
-							if (ItemName == itemstring) {
-								// Get the item info
-								MENUITEMINFOA menuitem = {sizeof(MENUITEMINFOA)};
-								char tmp[256];
-								menuitem.fMask = MIIM_TYPE | MIIM_SUBMENU;
-								menuitem.dwTypeData = (char *)tmp;
-								menuitem.cch = _countof(tmp);
-								GetMenuItemInfoA(hSubMenu, j, true, &menuitem);
-								// Set the new name
-								menuitem.dwTypeData = (LPSTR)NewName.c_str();
-								SetMenuItemInfoA(hSubMenu, j, true, &menuitem);
-								// Save the new item name
-								itemNames[i] = NewName;
-								return true;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return false;
-}
-
 
 // Enable or disable a popup item
 bool ofxWinMenu::EnablePopupItem(std::string ItemName, bool bEnabled)
@@ -384,11 +297,6 @@ LRESULT CALLBACK ofxWinMenuWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				case SC_MONITORPOWER: // Monitor Trying To Enter Powersave?
 				return 0;             // Prevent From Happening
 			}
-			break;
-
-		case WM_NCLBUTTONDOWN:
-			// Inform ofApp of click outside client area
-			pThis->MenuFunction("WM_NCLBUTTONDOWN", true);
 			break;
 
 		case WM_ENTERMENULOOP:
