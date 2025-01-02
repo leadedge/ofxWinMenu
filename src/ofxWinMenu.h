@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016-2024 Lynn Jarvis.
+	Copyright (C) 2016-2025 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -31,6 +31,10 @@
 #include <Windows.h>
 #include <string>
 #include <vector>
+#include <io.h> // For _access
+#include <Shlwapi.h> // For path functions
+#pragma comment(lib, "Shlwapi.Lib")
+
 
 class ofApp; // Forward declaration
 
@@ -56,8 +60,6 @@ class ofxWinMenu {
 		bool AddPopupItem(HMENU hSubMenu, std::string ItemName, bool bChecked, bool bAutoCheck);
 		bool AddPopupSeparator(HMENU hSubMenu);
 
-
-
 		// Set the menu to the application
 		bool SetWindowMenu();
 
@@ -73,14 +75,26 @@ class ofxWinMenu {
 		// Enable or disable (grey out) a popup item
 		bool EnablePopupItem(std::string ItemName, bool bEnabled);
 
-		// Function from ofApp for return of memu item selection
+		// Get the checkmark state of a popup item
+		bool GetPopupItem(std::string ItemName);
+
+		// Save item states to an initialization file with optional overwrite
+		void Save(std::string filename, bool bOverWrite = false);
+
+		// Load item states from an initialization file
+		void Load(std::string filename);
+
+		// Create menu with ofApp function for return of memu item selection
 		void CreateMenuFunction(void(ofApp::*function)(std::string title, bool bChecked));
 
-		// Function for ofxWinMenu to return menu item selection to ofApp
+		// ofxWinMenu function to return menu item selection to ofApp
 		void MenuFunction(std::string title, bool bChecked);
 
-		ofApp *pApp; // Pointer to access the ofApp class
-		void(ofApp::*pAppMenuFunction)(std::string title, bool bChecked); // The ofApp menu function
+		// Pointer to access the ofApp class
+		ofApp *pApp;
+
+		// The ofApp menu function
+		void(ofApp::*pAppMenuFunction)(std::string title, bool bChecked);
 
 		// Menu item data
 		std::vector<std::string> itemNames; // Name of the menu item

@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016-2024 Lynn Jarvis.
+	Copyright (C) 2016-2025 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -34,6 +34,7 @@
 	01.10.21 - Correct AddPopupSeparator to include MF_BYPOSITION
 	07.05.22 - Change EnablePopupItem to use menu item number directly
 	07.12.23 - used std:: thoughout instead of depending on "using namespave std"
+	02.01.25 - Add GetPopupItem, Save and Load functions
 
 */
 #include "ofxWinMenu.h"
@@ -244,10 +245,9 @@ bool ofxWinMenu::EnablePopupItem(std::string ItemName, bool bEnabled)
 {
 	if (g_hwnd == NULL || g_hMenu == NULL || !IsMenu(g_hMenu)) return false;
 
-	int nItems = (int)itemIDs.size();
-	if (nItems > 0) {
+	if (itemIDs.size() > 0) {
 		// Find the item number
-		for (int i = 0; i < nItems; i++) {
+		for (int i = 0; i < (int)itemIDs.size(); i++) {
 			if (ItemName == itemNames.at(i)) {
 				if (bEnabled)
 					EnableMenuItem(g_hMenu, i, MF_ENABLED);
@@ -260,6 +260,142 @@ bool ofxWinMenu::EnablePopupItem(std::string ItemName, bool bEnabled)
 	return false;
 }
 
+// Get the checkmark state of a popup item
+bool ofxWinMenu::GetPopupItem(std::string ItemName)
+{
+	if (itemIDs.size() > 0) {
+		// Find the item number
+		for (int i = 0; i < (int)itemIDs.size(); i++) {
+			if (ItemName == itemNames.at(i)) {
+				return isChecked[i];
+			}
+		}
+	}
+	return false;
+}
+
+// Save popup item states to an initialization file
+void ofxWinMenu::Save(std::string filename, bool bOverWrite)
+{
+	char tmp[MAX_PATH]{};
+	std::string inipath;
+
+	// Check extension
+	size_t pos = filename.rfind(".ini");
+	if (pos == std::string::npos) {
+		// No extension or not ".ini"
+		pos = filename.rfind(".");
+		if (pos == std::string::npos) {
+			// No extension - add ".ini"
+			filename = filename + ".ini";
+		}
+		else {
+			// Extension not "ini" 
+			// Strip extension
+			filename = filename.substr(0, pos);
+			// Add ".ini"
+			filename = filename + ".ini";
+		}
+	}
+
+	// Check for full path
+	if (filename.find('/') != std::string::npos || filename.find('\\') != std::string::npos) {
+		inipath = filename;
+	}
+	else {
+		// filename only - add full path - (bin\data directory)
+		char path[MAX_PATH]{};
+		GetModuleFileNameA(NULL, path, MAX_PATH);
+		PathRemoveFileSpecA(path);
+		inipath = path;
+		inipath = inipath + "\\data\\" + filename;
+	}
+
+	// Check if file exists if bOverWrite is false
+	if (!bOverWrite && _access(inipath.c_str(), 0) != -1) {
+		sprintf_s(tmp, MAX_PATH, "%s exists - overwrite?", filename.c_str());
+		if (MessageBoxA(NULL, tmp, "Warning", MB_YESNO | MB_TOPMOST) == IDNO)
+			return;
+	}
+
+	if (itemIDs.size() > 0) {
+		// Find the item number
+		for (int i = 0; i < (int)itemIDs.size(); i++) {
+
+			if (autoCheck[i]) {
+				// For debugging
+				// sprintf_s(tmp, MAX_PATH, "Save : item [%s] = %d\n", itemNames.at(i).c_str(), (bool)isChecked[i]);
+				// MessageBoxA(NULL, tmp, "Save", MB_OK | MB_TOPMOST);
+				if (isChecked[i])
+					WritePrivateProfileStringA((LPCSTR)"Menu", (LPCSTR)itemNames.at(i).c_str(), (LPCSTR)"1", (LPCSTR)inipath.c_str());
+				else
+					WritePrivateProfileStringA((LPCSTR)"Menu", (LPCSTR)itemNames.at(i).c_str(), (LPCSTR)"0", (LPCSTR)inipath.c_str());
+			}
+		}
+	}
+}
+
+// Load item states from an initialization file
+void ofxWinMenu::Load(std::string filename)
+{
+	char tmp[MAX_PATH]{};
+	std::string inipath="";
+
+	// Section for the control in the initialization file
+	std::string ControlSection="";
+
+	// Check extension
+	size_t pos = filename.rfind(".ini");
+	if (pos == std::string::npos) {
+		// No extension or not ".ini"
+		pos = filename.rfind(".");
+		if (pos == std::string::npos) {
+			// No extension - add ".ini"
+			filename = filename + ".ini";
+		}
+		else {
+			// Extension not "ini"
+			sprintf_s(tmp, "%s is not an initialization file\n", filename.c_str());
+			MessageBoxA(NULL, tmp, "Warning", MB_OK | MB_TOPMOST);
+			return;
+		}
+	}
+
+	// Check for full path
+	if (filename.find('/') != std::string::npos || filename.find('\\') != std::string::npos) {
+		inipath = filename;
+	}
+	else {
+		// filename only - add full path - (bin\data directory)
+		char path[MAX_PATH]{};
+		GetModuleFileNameA(NULL, path, MAX_PATH);
+		PathRemoveFileSpecA(path);
+		inipath = path;
+		inipath = inipath + "\\data\\" + filename;
+	}
+
+	// Check that the file exists in case an extension was added
+	if (_access(inipath.c_str(), 0) == -1) {
+		sprintf_s(tmp, "Initialization file \"%s\" not found.", inipath.c_str());
+		MessageBoxA(NULL, tmp, "Warning", MB_OK | MB_TOPMOST);
+		return;
+	}
+
+	// Load item states
+	// Only those saved in the ini file are changed
+	if (itemIDs.size() > 0) {
+		for (int i = 0; i < (int)itemIDs.size(); i++) {
+			if (GetPrivateProfileStringA((LPCSTR)"Menu", (LPCSTR)(LPCSTR)itemNames.at(i).c_str(), NULL, (LPSTR)tmp, MAX_PATH, (LPCSTR)inipath.c_str()) > 0) {
+				if (tmp[0]) isChecked[i] = (bool)(atoi(tmp) == 1);
+				// For debugging
+				// sprintf_s(tmp, MAX_PATH, "Load : item [%s] = %d\n", itemNames.at(i).c_str(), (bool)isChecked[i]);
+				// MessageBoxA(NULL, tmp, "Load", MB_OK | MB_TOPMOST);
+				SetPopupItem(itemNames.at(i), isChecked[i]);
+			}
+		}
+	}
+
+}
 
 // ofApp Function for return of memu item selection
 void ofxWinMenu::CreateMenuFunction(void(ofApp::*function)(std::string title, bool bChecked))
