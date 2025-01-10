@@ -35,6 +35,9 @@
 	07.05.22 - Change EnablePopupItem to use menu item number directly
 	07.12.23 - used std:: thoughout instead of depending on "using namespave std"
 	02.01.25 - Add GetPopupItem, Save and Load functions
+	09.01.25 - Return new values to ofApp in Load function
+	10.01.25 - Change Load from void to bool
+
 
 */
 #include "ofxWinMenu.h"
@@ -336,13 +339,10 @@ void ofxWinMenu::Save(std::string filename, bool bOverWrite)
 }
 
 // Load item states from an initialization file
-void ofxWinMenu::Load(std::string filename)
+bool ofxWinMenu::Load(std::string filename)
 {
 	char tmp[MAX_PATH]{};
 	std::string inipath="";
-
-	// Section for the control in the initialization file
-	std::string ControlSection="";
 
 	// Check extension
 	size_t pos = filename.rfind(".ini");
@@ -355,9 +355,8 @@ void ofxWinMenu::Load(std::string filename)
 		}
 		else {
 			// Extension not "ini"
-			sprintf_s(tmp, "%s is not an initialization file\n", filename.c_str());
-			MessageBoxA(NULL, tmp, "Warning", MB_OK | MB_TOPMOST);
-			return;
+			printf("ofxWinMenu::Load\n%s is not an initialization file\n", filename.c_str());
+			return false;
 		}
 	}
 
@@ -376,9 +375,8 @@ void ofxWinMenu::Load(std::string filename)
 
 	// Check that the file exists in case an extension was added
 	if (_access(inipath.c_str(), 0) == -1) {
-		sprintf_s(tmp, "Initialization file \"%s\" not found.", inipath.c_str());
-		MessageBoxA(NULL, tmp, "Warning", MB_OK | MB_TOPMOST);
-		return;
+		printf("ofxWinMenu::Load\nInitialization file \"%s\" not found.\n", inipath.c_str());
+		return false;
 	}
 
 	// Load item states
@@ -388,13 +386,15 @@ void ofxWinMenu::Load(std::string filename)
 			if (GetPrivateProfileStringA((LPCSTR)"Menu", (LPCSTR)(LPCSTR)itemNames.at(i).c_str(), NULL, (LPSTR)tmp, MAX_PATH, (LPCSTR)inipath.c_str()) > 0) {
 				if (tmp[0]) isChecked[i] = (bool)(atoi(tmp) == 1);
 				// For debugging
-				// sprintf_s(tmp, MAX_PATH, "Load : item [%s] = %d\n", itemNames.at(i).c_str(), (bool)isChecked[i]);
+				// sprintf_s(tmp, MAX_PATH, "Menu Load : item [%s] = %d\n", itemNames.at(i).c_str(), (bool)isChecked[i]);
 				// MessageBoxA(NULL, tmp, "Load", MB_OK | MB_TOPMOST);
 				SetPopupItem(itemNames.at(i), isChecked[i]);
+				// Return new value to ofApp
+				MenuFunction(itemNames.at(i), isChecked[i]);
 			}
 		}
 	}
-
+	return true;
 }
 
 // ofApp Function for return of memu item selection

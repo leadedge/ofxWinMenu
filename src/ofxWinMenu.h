@@ -82,7 +82,7 @@ class ofxWinMenu {
 		void Save(std::string filename, bool bOverWrite = false);
 
 		// Load item states from an initialization file
-		void Load(std::string filename);
+		bool Load(std::string filename);
 
 		// Create menu with ofApp function for return of memu item selection
 		void CreateMenuFunction(void(ofApp::*function)(std::string title, bool bChecked));
