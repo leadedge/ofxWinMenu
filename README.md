@@ -18,8 +18,10 @@ Create a menu for a Microsoft Windows Openframeworks application.
 
 ### Example advanced
 
+The advanced example includes using the addon [ofxWinDialog](https://github.com/leadedge/ofxWinDialog). Two dialogs are created and managed without the use of resources or message handlers. Although resources are not required, they are retained to embed image and icon data and version information into the executable. ofxWinMenu and ofxWinDialog can share variables and one can be updated from the other. Each can share a common initialization file to save settings.
+
 - Copy the source files from "ofxWinMenu/example-advanced/src" to the application "src" folder.
-- Copy the image and font files from "ofxWinMenu/example-advanced/bin/data" to the application "bin/data" folder.
+- Copy the file from "ofxWinMenu/example-advanced/bin/data" to the application "bin/data" folder.
 - Add resource.h and resource.rc to your project.
 
 ### Using ofxWinMenu
