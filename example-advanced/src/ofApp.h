@@ -2,7 +2,7 @@
 
 	ofxWinMenu advanced example - opApp.h
 
-	Copyright (C) 2016-2022 Lynn Jarvis.
+	Copyright (C) 2016-2025 Lynn Jarvis.
 
 	http://www.spout.zeal.co
 
@@ -26,6 +26,8 @@
 
 #include "ofMain.h"
 #include "ofxWinMenu.h" // Menu addon
+#include "ofxWinDialog.h" // Dialog addon
+#include "resource.h" // For resources
 #include <shellapi.h> // For ShellExecute
 // For GetFileVersionInfo and GetFileVersionInfoSize
 #include <winver.h> 
@@ -39,6 +41,8 @@ class ofApp : public ofBaseApp {
 		void setup();
 		void update();
 		void draw();
+		// exit function for initialization file save
+		void exit();
 
 		void keyPressed(int key); // Traps escape key if exit disabled
 		void keyReleased(int key);
@@ -50,35 +54,43 @@ class ofApp : public ofBaseApp {
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
+		// Load image from resources
+		bool LoadResourceImage(ofImage& image, int index);
+
+		// Used by dialogs and menu
+		HWND hWndApp; // Application window
+		HINSTANCE hInstance; // Application instance
+
 		// Menu
 		ofxWinMenu * menu; // Menu object
 		void appMenuFunction(string title, bool bChecked); // Menu return function
+		void CreateAppMenu(); // Create the application menu
+
+		// Options dialog
+		ofxWinDialog* options; // Dialog object
+		HWND hwndOptions = NULL; // Dialog window
+		void CreateOptionsDialog(); // Create the example dialog controls
+		// Callback function for ofxWinDialog to return control values
+		void OptionsDialogFunction(std::string title, std::string text, int value);
+
+		// Second dialog (About)
+		ofxWinDialog* about; // Dialog object
+		HWND hwndAbout = NULL; // Dialog window
+		void CreateAboutDialog(); // Create about dialog
+		void AboutDialogFunction(std::string title, std::string text, int value);
 
 		// Used by example app
 		ofTrueTypeFont myFont;
         ofImage myImage;
 		float windowWidth, windowHeight;
+		std::string iniPath; // Initialization path
 		
-		// Example menu variables
+		// Variable changed by the menu
 		bool bShowInfo;
-		bool bFullscreen;
-		bool bTopmost;
 
-		// Example functions
- 		void doFullScreen(bool bFull);
-		void doTopmost(bool bTop);
-
-		// Used by About dialog or other dialogs and callbacks
-		HWND hWnd; // Application window
-		HWND hWndForeground; // current foreground window
-		HINSTANCE hInstance; // Application instance
-
-		// Used by the example modeless dialog
+		// Options dialog
 		HWND hWndDialog; // Dialog window
-		float TrackbarValue; // Value changed by the trackbar
-		float OldTrackbarValue; // Backup value in case of cancel
-		bool bCheckBox; // Checkbox status
-		bool bOldCheckBox; // Backup
-		bool bButton; // Button press flag
+		int Alpha = 255; // Value changed by the trackbar
+		// bShowInfo is common with the menu
 
 };

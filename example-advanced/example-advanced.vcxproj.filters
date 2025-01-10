@@ -7,27 +7,54 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxWinDialog\src\ofxWinDialog.cpp">
+      <Filter>addons\ofxWinDialog\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxWinDialog\libs\SpoutUtils.cpp">
+      <Filter>addons\ofxWinDialog\libs</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\addons\ofxWinMenu\src\ofxWinMenu.cpp">
-      <Filter>Addons</Filter>
+      <Filter>addons\ofxWinMenu\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
       <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Addons">
-      <UniqueIdentifier>{2fb46289-4603-49da-b4ab-522cc68f47a9}</UniqueIdentifier>
+    <Filter Include="addons">
+      <UniqueIdentifier>{F71E0B39--B66-9-4A-C4-9-5D5-A233EF307116}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxWinDialog">
+      <UniqueIdentifier>{7C05E735--217-7-43-EA-8-42D-F448A7DEEE0C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxWinDialog\src">
+      <UniqueIdentifier>{FB29EE95--507-9-4C-DD-8-0D0-DEBB72FC786E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxWinDialog\libs">
+      <UniqueIdentifier>{26D08AE9--1C7-2-45-EF-A-6A3-FEC3B292AABC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxWinMenu">
+      <UniqueIdentifier>{791EBC50--6D0-B-47-D4-9-71C-312611C48DB9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxWinMenu\src">
+      <UniqueIdentifier>{AB65C83E--2A0-2-45-5D-A-14A-7372ECCF57B1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\resource.h">
-      <Filter>src</Filter>
+    <ClInclude Include="..\..\..\addons\ofxWinDialog\src\ofxWinDialog.h">
+      <Filter>addons\ofxWinDialog\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxWinDialog\libs\SpoutUtils.h">
+      <Filter>addons\ofxWinDialog\libs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxWinMenu\src\ofxWinMenu.h">
-      <Filter>Addons</Filter>
+      <Filter>addons\ofxWinMenu\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
