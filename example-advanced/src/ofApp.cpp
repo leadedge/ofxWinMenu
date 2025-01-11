@@ -126,7 +126,13 @@ void ofApp::setup() {
 	// are not affected by duplicate controls loaded by menu->Load.
 	// In this example "bShowInfo".
 	options->Load(iniPath, "");
+	// Update ofApp with the loaded values
+	options->GetControls();
+	// Load the menu items
 	menu->Load(iniPath);
+
+	// The initializetion file is updated
+	// when ofApp closes - see exit()
 
 } // end Setup
 
@@ -212,13 +218,14 @@ void ofApp::CreateOptionsDialog()
 	options->AddSlider("Slider 1", 70, ypos, 200, 30, 0, 255, Alpha, true, 16);
 	ypos += 45;
 	options->AddCheckBox("Checkbox 1", "Show info",    50, ypos,  100, 20, bShowInfo, true);
-	options->AddButton("Load button", "Reload",       170, ypos-5, 95, 30);
 	ypos += 55;
 
 	// OK, Cancel, Reset
-	options->AddButton("OK button", "OK",          30, ypos, 95, 30, BS_DEFPUSHBUTTON);
-	options->AddButton("Cancel button", "Cancel", 130, ypos, 95, 30);
-	options->AddButton("Reset button", "Reset",   230, ypos, 95, 30);
+	options->AddButton("Load button", "Reload",    25, ypos, 70, 30);
+	options->AddButton("Reset button", "Reset",   100, ypos, 70, 30);
+
+	options->AddButton("OK button", "OK",         175, ypos, 70, 30, BS_DEFPUSHBUTTON);
+	options->AddButton("Cancel button", "Cancel", 250, ypos, 70, 30);
 
 	//
 	// Initialization file sections
@@ -267,12 +274,22 @@ void ofApp ::OptionsDialogFunction(std::string title, std::string text, int valu
 		menu->Save(iniPath, true);
 	}
 
-	// Load control values
+	// Load control values from initialization file
 	if (title == "Load button") {
 		// Load all controls, regardless of section
 		options->Load(iniPath);
+		// Update ofApp
+		options->GetControls();
 		// Load the menu items as well
 		menu->Load(iniPath);
+	}
+
+	// Reset all controls to starting values
+	if (title == "Reset button") {
+		// Reset controls
+		options->Reset();
+		// Update ofApp
+		options->GetControls();
 	}
 
 	// OK
@@ -291,16 +308,6 @@ void ofApp ::OptionsDialogFunction(std::string title, std::string text, int valu
 		options->Restore();
 		// Return values to ofApp
 		options->GetControls();
-		options->Close();
-	}
-
-	// Reset all controls to starting values
-	if (title == "Reset button") {
-		// Reset controls
-		options->Reset();
-		// Update ofApp
-		options->GetControls();
-		// Close dialog
 		options->Close();
 	}
 
