@@ -29,8 +29,7 @@
 #include "ofxWinDialog.h" // Dialog addon
 #include "resource.h" // For resources
 #include <shellapi.h> // For ShellExecute
-// For GetFileVersionInfo and GetFileVersionInfoSize
-#include <winver.h> 
+#include <winver.h> // For GetFileVersionInfo and GetFileVersionInfoSize
 #pragma comment(lib, "Version.lib")
 
 
@@ -41,8 +40,7 @@ class ofApp : public ofBaseApp {
 		void setup();
 		void update();
 		void draw();
-		// exit function for initialization file save
-		void exit();
+		void exit(); // exit function for initialization file save
 
 		void keyPressed(int key); // Traps escape key if exit disabled
 		void keyReleased(int key);
@@ -90,7 +88,7 @@ class ofApp : public ofBaseApp {
 
 		// Options dialog
 		HWND hWndDialog; // Dialog window
-		int Alpha = 255; // Value changed by the trackbar
+		int Brightness = 255; // Value changed by the trackbar
 		// bShowInfo is common with the menu
 
 };

@@ -14,10 +14,8 @@
 	  - example dialog with controls
 	  - About dialog with Version information
 
-	Resources are used to embed data into the executable instead of
-	requiring additional files at runtime.
-	  - Image
-	  - Icon
+	Resources are used to embed image and icon data into the
+	executable instead of requiring additional files at runtime.
 	The resource also contains Version information which enables
 	the version to show in Windows explorer and in the file properties.
 	See resource.h and resource.rc.
@@ -66,22 +64,23 @@ void ofApp::setup() {
 	// Centre on the screen
 	ofSetWindowPosition((ofGetScreenWidth()-windowWidth)/2, (ofGetScreenHeight()-windowHeight)/2);
 
-	// Load a font rather than the default
-	myFont.load("verdana.ttf", 14, true, true);
+	// Load a font
+	myFont.load("Verdana.ttf", 14);
 
-	// Load an image for the example from resources
+	// Load an image from resources
 	LoadResourceImage(myImage, 0);
 
-	// Initialization path
-	iniPath = GetExePath() + "example-advanced.ini"; // Path of executable
+	// Initialization file path (path of executable)
+	iniPath = GetExePath() + "example-advanced.ini";
 
 	// Instance and window handles used for dialogs and the menu
 	hInstance = GetModuleHandle(NULL);
 	hWndApp = ofGetWin32Window();
 
-	// Set a custom window icon (see resource.h and resource.rc)
-	// The icons IDI_ICON1 and IDI_ICON2 are defined in resources and
-	// embedded in the executable. Icon files are not necessary at runtime.
+	// Set a custom window icon
+	// IDI_ICON1, and IDI_ICON2 for the dialog, are defined in 
+	// resources and the icon files are not required at runtime.
+	// (see resource.h and resource.rc).
 	HICON hIcon = LoadIconA(GetModuleHandle(NULL), MAKEINTRESOURCEA(IDI_ICON1));
 	SendMessage(hWndApp, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	SendMessage(hWndApp, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
@@ -105,7 +104,7 @@ void ofApp::setup() {
 	options = new ofxWinDialog(this, hInstance, hWndApp);
 	// Register an ofApp function that is called when a dialog control is selected.
 	options->AppDialogFunction(&ofApp::OptionsDialogFunction);
-	// Icon for the dialog window from resources
+	// Icon for the dialog window
 	hIcon = LoadIconA(GetModuleHandle(NULL), MAKEINTRESOURCEA(IDI_ICON2));
 	options->SetIcon(hIcon);
 	// Create the options dialog
@@ -214,8 +213,8 @@ void ofApp::appMenuFunction(string title, bool bChecked) {
 void ofApp::CreateOptionsDialog()
 {
 	int ypos = 20;
-	options->AddText("Alpha",      20, ypos,  50, 30);
-	options->AddSlider("Slider 1", 70, ypos, 200, 30, 0, 255, Alpha, true, 16);
+	options->AddText("Brightness",  20, ypos, 100, 30);
+	options->AddSlider("Slider 1", 105, ypos, 175, 30, 0, 255, Brightness, true, 16);
 	ypos += 45;
 	options->AddCheckBox("Checkbox 1", "Show info",    50, ypos,  100, 20, bShowInfo, true);
 	ypos += 55;
@@ -254,7 +253,7 @@ void ofApp ::OptionsDialogFunction(std::string title, std::string text, int valu
 	if (title == "Slider 1") {
 		// Background darkness (see Draw)
 		// value is returned *100 for a trackbar
-		Alpha = value/100;
+		Brightness = value/100;
 	}
 
 	if (title == "Checkbox 1") {
@@ -388,8 +387,7 @@ void ofApp::update() {
 void ofApp::draw() {
 
 	// Darken background to the Options dialog trackbar value
-	// to simulate alpha change
-	ofSetColor(Alpha);
+	ofSetColor(Brightness);
 
 	myImage.draw(0, 0, ofGetWidth(), ofGetHeight());
 
@@ -485,35 +483,34 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 bool ofApp::LoadResourceImage(ofImage& image, int index)
 {
 	HMODULE hModule = NULL;
-	DWORD size = 0;
+	DWORD dwSize = 0;
 	HRSRC hResInfo = NULL;
-	HGLOBAL rcImageData = NULL;
-	const char* imagedata = NULL;
+	HGLOBAL rcData = NULL;
+	const char* data = NULL;
 
 	hModule = GetCurrentModule();
 	if (hModule) {
-		hResInfo = FindResource(hModule, MAKEINTRESOURCE(IDC_IMAGEFILE0+index), RT_RCDATA);
+		hResInfo = FindResource(hModule, MAKEINTRESOURCE(IDB_IMAGEFILE0+index), RT_RCDATA);
 		if (hResInfo) {
-			size = SizeofResource(hModule, hResInfo);
-			if (size > 0) {
-				rcImageData = LoadResource(hModule, hResInfo);
-				if (rcImageData) {
-					imagedata = static_cast<const char*>(LockResource(rcImageData));
+			dwSize = SizeofResource(hModule, hResInfo);
+			if (dwSize > 0) {
+				rcData = LoadResource(hModule, hResInfo);
+				if (rcData) {
+					data = static_cast<const char*>(LockResource(rcData));
 					ofBuffer buffer;
-					buffer.set(imagedata, size);
+					buffer.set(data, dwSize);
 					ofPixels pixels;
 					if (ofLoadImage(pixels, buffer)) {
 						image.setFromPixels(pixels);
-						UnlockResource(rcImageData);
-						FreeResource(rcImageData);
+						UnlockResource(rcData);
+						FreeResource(rcData);
 						return true;
 					}
-					UnlockResource(rcImageData);
+					UnlockResource(rcData);
 				}
-				FreeResource(rcImageData);
+				FreeResource(rcData);
 			}
 		}
-		return false;
 	}
 	return false;
 }
