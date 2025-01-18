@@ -133,6 +133,10 @@ void ofApp::setup() {
 	// The initializetion file is updated
 	// when ofApp closes - see exit()
 
+	// Open the options dialog - see MousePressed
+	hwndOptions = options->Open("Options");
+
+
 } // end Setup
 
 
@@ -394,8 +398,8 @@ void ofApp::draw() {
 	// Show on-screen info - activated by
 	// Menu item and Options dialog checkbox
 	if(bShowInfo) {
-		std::string str = " ' ' show/hide info : RH click for options";
-		myFont.drawString(str, 15, ofGetHeight()-20);
+		std::string str = " ' ' show/hide info : Right mouse click for options dialog";
+		myFont.drawString(str, 40, ofGetHeight()-20);
 	}
 
 
@@ -444,11 +448,13 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-	if(button == 2) { // rh button
-		// Open/Close the the Options dialog window
+
+	// Right button
+	if(button == 2) {
+		// Open/Close the Options dialog window
 		if (!hwndOptions) {
-			// Menu options change duplicate variables
-			// Set them here before opening the dialog
+			// bShowInfo is changed by both the Menu and the dialog
+			// Set it here before opening the dialog
 			options->SetCheckBox("Checkbox 1", bShowInfo);
 			hwndOptions = options->Open("Options");
 		}
@@ -456,6 +462,7 @@ void ofApp::mousePressed(int x, int y, int button){
 			options->Close();
 		}
 	}
+
 }
 
 //--------------------------------------------------------------

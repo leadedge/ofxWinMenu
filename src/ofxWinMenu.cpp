@@ -37,6 +37,7 @@
 	02.01.25 - Add GetPopupItem, Save and Load functions
 	09.01.25 - Return new values to ofApp in Load function
 	10.01.25 - Change Load from void to bool
+	17.01.25 - Constructor - change LongPtrA functions to LongPtr
 
 
 */
@@ -58,13 +59,13 @@ ofxWinMenu::ofxWinMenu(ofApp *app, HWND hwnd) {
 	pApp = app; // The ofApp class pointer
 
 	// Save the Openframeworks application window message procedure
-	ofAppWndProc = (WNDPROC)GetWindowLongPtrA(g_hwnd, GWLP_WNDPROC);
+	ofAppWndProc = (WNDPROC)GetWindowLongPtr(g_hwnd, GWLP_WNDPROC);
 	
 	// Set our own window message procedure
-	SetWindowLongPtrA(g_hwnd, GWLP_WNDPROC, (LONG_PTR)ofxWinMenuWndProc);
+	SetWindowLongPtr(g_hwnd, GWLP_WNDPROC, (LONG_PTR)ofxWinMenuWndProc);
 
 	// Set the Menu name
-	SetClassLongPtrA(g_hwnd, GCLP_MENUNAME, (LONG_PTR)"ofxWinMenu");
+	SetClassLongPtr(g_hwnd, GCLP_MENUNAME, (LONG_PTR)L"ofxWinMenu");
 
 }
 
