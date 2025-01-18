@@ -114,7 +114,7 @@ void ofApp::setup() {
 	//
 	// Create an About dialog using ofxWinDialog
 	// A unique class name is required for multiple dialogs
-	about = new ofxWinDialog(this, hInstance, hWndApp, L"ofxAbout");
+	about = new ofxWinDialog(this, hInstance, hWndApp, "ofxAbout");
 	about->SetIcon(hIcon);
 	about->AppDialogFunction(&ofApp::AboutDialogFunction);
 	CreateAboutDialog();
@@ -194,7 +194,12 @@ void ofApp::appMenuFunction(string title, bool bChecked) {
 	// File > Options
 	if (title == "Options") {
 		// Open the options dialog if not already open
-		if (!hwndOptions) hwndOptions = options->Open("Options");
+		if (!hwndOptions) {
+			// bShowInfo is changed by both the Menu and the dialog
+			// Set it here before opening the dialog
+			options->SetCheckBox("Checkbox 1", bShowInfo);
+			hwndOptions = options->Open("Options");
+		}
 	}
 
 	// View > Show info

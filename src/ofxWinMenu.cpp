@@ -38,6 +38,7 @@
 	09.01.25 - Return new values to ofApp in Load function
 	10.01.25 - Change Load from void to bool
 	17.01.25 - Constructor - change LongPtrA functions to LongPtr
+	18.01.25 - Constructor - conditional Unicode for menu name
 
 
 */
@@ -60,12 +61,16 @@ ofxWinMenu::ofxWinMenu(ofApp *app, HWND hwnd) {
 
 	// Save the Openframeworks application window message procedure
 	ofAppWndProc = (WNDPROC)GetWindowLongPtr(g_hwnd, GWLP_WNDPROC);
-	
+
 	// Set our own window message procedure
 	SetWindowLongPtr(g_hwnd, GWLP_WNDPROC, (LONG_PTR)ofxWinMenuWndProc);
 
 	// Set the Menu name
+	#ifdef UNICODE
 	SetClassLongPtr(g_hwnd, GCLP_MENUNAME, (LONG_PTR)L"ofxWinMenu");
+	#else
+	SetClassLongPtrA(g_hwnd, GCLP_MENUNAME, (LONG_PTR)"ofxWinMenu");
+	#endif
 
 }
 
