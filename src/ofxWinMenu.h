@@ -75,6 +75,9 @@ class ofxWinMenu {
 		// Enable or disable (grey out) a popup item
 		bool EnablePopupItem(std::string ItemName, bool bEnabled);
 
+		// Get item enabled state
+		bool GetEnabled(std::string ItemName);
+
 		// Get the checkmark state of a popup item
 		bool GetPopupItem(std::string ItemName);
 

@@ -4,7 +4,7 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
-	Copyright (C) 2016-2025 Lynn Jarvis.
+	Copyright (C) 2016-2026 Lynn Jarvis.
 
 	https://github.com/leadedge
 
@@ -39,7 +39,10 @@
 	10.01.25 - Change Load from void to bool
 	17.01.25 - Constructor - change LongPtrA functions to LongPtr
 	18.01.25 - Constructor - conditional Unicode for menu name
-
+	12.05.25 - Load/Save allow for empty file name
+	12.06.26 - Load - Load item states 
+			   Test for tmp returned by GetPrivateProfileString
+	31.07.26 - Add GetEnabled(std::string ItemName)
 
 */
 #include "ofxWinMenu.h"
@@ -269,6 +272,23 @@ bool ofxWinMenu::EnablePopupItem(std::string ItemName, bool bEnabled)
 	return false;
 }
 
+// Get item enabled state
+bool ofxWinMenu::GetEnabled(std::string ItemName)
+{
+	if (itemIDs.size() > 0) {
+		// Find the item number
+		for (int i = 0; i < (int)itemIDs.size(); i++) {
+			if (ItemName == itemNames.at(i)) {
+				if ((GetMenuState(g_hMenu, i, MF_BYCOMMAND) & MF_DISABLED) != MF_DISABLED) {
+					// Menu item is enabled
+					return true;
+				}
+		    }
+		}
+	}
+	return false;
+}
+
 // Get the checkmark state of a popup item
 bool ofxWinMenu::GetPopupItem(std::string ItemName)
 {
@@ -289,40 +309,60 @@ void ofxWinMenu::Save(std::string filename, bool bOverWrite)
 	char tmp[MAX_PATH]{};
 	std::string inipath;
 
-	// Check extension
-	size_t pos = filename.rfind(".ini");
-	if (pos == std::string::npos) {
-		// No extension or not ".ini"
-		pos = filename.rfind(".");
-		if (pos == std::string::npos) {
-			// No extension - add ".ini"
-			filename = filename + ".ini";
-		}
-		else {
-			// Extension not "ini" 
-			// Strip extension
-			filename = filename.substr(0, pos);
-			// Add ".ini"
-			filename = filename + ".ini";
+	// If no filename, create ini file from exe path
+	if (filename.empty()) {
+		// Find the path of the executable
+		char logpath[MAX_PATH] {};
+		if (GetModuleFileNameA(NULL, (LPSTR)logpath, sizeof(logpath))) {
+			inipath = logpath;
+			// Strip ".exe" and replace with ".ini"
+			inipath = inipath.substr(0, inipath.rfind(".")) + ".ini";
 		}
 	}
-
-	// Check for full path
-	if (filename.find('/') != std::string::npos || filename.find('\\') != std::string::npos) {
+	else if (filename.find('/') != std::string::npos || filename.find('\\') != std::string::npos) {
+		// Check for full path
 		inipath = filename;
 	}
 	else {
-		// filename only - add full path - (bin\data directory)
-		char path[MAX_PATH]{};
+		// filename only - add full path - (executable directory)
+		char path[MAX_PATH] {};
 		GetModuleFileNameA(NULL, path, MAX_PATH);
 		PathRemoveFileSpecA(path);
 		inipath = path;
-		inipath = inipath + "\\data\\" + filename;
+		inipath += "\\data\\";
+		// Does the folder exist ?
+		if (_access(inipath.c_str(), 0) != -1) {
+			// Openframeworks application
+			inipath += filename;
+		}
+		else {
+			// Executable folder
+			inipath = path;
+			inipath += "\\";
+			inipath += filename;
+		}
 	}
 
-	// Check if file exists if bOverWrite is false
+	// Check extension
+	size_t pos = inipath.rfind(".ini");
+	if (pos == std::string::npos) {
+		// No extension or not ".ini"
+		pos = inipath.rfind(".");
+		if (pos == std::string::npos) {
+			// No extension - add ".ini"
+			inipath = inipath + ".ini";
+		} else {
+			// Extension not "ini"
+			// Strip extension
+			inipath = inipath.substr(0, pos);
+			// Add ".ini"
+			inipath = inipath + ".ini";
+		}
+	}
+
+	// Check if file exists if bOverWrite is false (default)
 	if (!bOverWrite && _access(inipath.c_str(), 0) != -1) {
-		sprintf_s(tmp, MAX_PATH, "%s exists - overwrite?", filename.c_str());
+		sprintf_s(tmp, MAX_PATH, "%s exists - overwrite?", inipath.c_str());
 		if (MessageBoxA(NULL, tmp, "Warning", MB_YESNO | MB_TOPMOST) == IDNO)
 			return;
 	}
@@ -350,33 +390,55 @@ bool ofxWinMenu::Load(std::string filename)
 	char tmp[MAX_PATH]{};
 	std::string inipath="";
 
-	// Check extension
-	size_t pos = filename.rfind(".ini");
-	if (pos == std::string::npos) {
-		// No extension or not ".ini"
-		pos = filename.rfind(".");
-		if (pos == std::string::npos) {
-			// No extension - add ".ini"
-			filename = filename + ".ini";
-		}
-		else {
-			// Extension not "ini"
-			printf("ofxWinMenu::Load\n%s is not an initialization file\n", filename.c_str());
-			return false;
+	// If no filename, create ini file from exe path
+	if (filename.empty()) {
+		// Find the path of the executable
+		char logpath[MAX_PATH] {};
+		if (GetModuleFileNameA(NULL, (LPSTR)logpath, sizeof(logpath))) {
+			inipath = logpath;
+			// Strip ".exe" and replace with ".ini"
+			inipath = inipath.substr(0, inipath.rfind(".")) + ".ini";
 		}
 	}
-
-	// Check for full path
-	if (filename.find('/') != std::string::npos || filename.find('\\') != std::string::npos) {
+	else if (filename.find('/') != std::string::npos || filename.find('\\') != std::string::npos) {
+		// Check for full path
 		inipath = filename;
 	}
 	else {
-		// filename only - add full path - (bin\data directory)
+		// filename only - add full path - (bin\data or executable directory)
 		char path[MAX_PATH]{};
 		GetModuleFileNameA(NULL, path, MAX_PATH);
 		PathRemoveFileSpecA(path);
 		inipath = path;
-		inipath = inipath + "\\data\\" + filename;
+		inipath += "\\data\\";
+		// Does the folder exist ?
+		if (_access(inipath.c_str(), 0) != -1) {
+			// Openframeworks application
+			inipath += filename;
+		}
+		else {
+			// Executable folder
+			inipath = path;
+			inipath += "\\";
+			inipath += filename;
+		}
+	}
+
+	// Check extension
+	size_t pos = inipath.rfind(".ini");
+	if (pos == std::string::npos) {
+		// No extension or not ".ini"
+		pos = inipath.rfind(".");
+		if (pos == std::string::npos) {
+			// No extension - add ".ini"
+			inipath = inipath + ".ini";
+		} else {
+			// Extension not "ini"
+			// Strip extension
+			inipath = inipath.substr(0, pos);
+			// Add ".ini"
+			inipath = inipath + ".ini";
+		}
 	}
 
 	// Check that the file exists in case an extension was added
@@ -385,18 +447,16 @@ bool ofxWinMenu::Load(std::string filename)
 		return false;
 	}
 
-	// Load item states
 	// Only those saved in the ini file are changed
 	if (itemIDs.size() > 0) {
 		for (int i = 0; i < (int)itemIDs.size(); i++) {
 			if (GetPrivateProfileStringA((LPCSTR)"Menu", (LPCSTR)(LPCSTR)itemNames.at(i).c_str(), NULL, (LPSTR)tmp, MAX_PATH, (LPCSTR)inipath.c_str()) > 0) {
-				if (tmp[0]) isChecked[i] = (bool)(atoi(tmp) == 1);
-				// For debugging
-				// sprintf_s(tmp, MAX_PATH, "Menu Load : item [%s] = %d\n", itemNames.at(i).c_str(), (bool)isChecked[i]);
-				// MessageBoxA(NULL, tmp, "Load", MB_OK | MB_TOPMOST);
-				SetPopupItem(itemNames.at(i), isChecked[i]);
-				// Return new value to ofApp
-				MenuFunction(itemNames.at(i), isChecked[i]);
+				if (tmp[0]) {
+					isChecked[i] = (bool)(atoi(tmp) == 1);
+					SetPopupItem(itemNames.at(i), isChecked[i]);
+					// Return value to ofApp
+					MenuFunction(itemNames.at(i), isChecked[i]);
+				}
 			}
 		}
 	}
@@ -432,13 +492,26 @@ LRESULT CALLBACK ofxWinMenuWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	switch (uMsg) {	
 
 		// Check For Windows system messages
-		case WM_SYSCOMMAND:	
+		case WM_SYSCOMMAND:
 
 			switch (wParam)	{         // Check System Calls
 				case SC_SCREENSAVE:   // Screensaver Trying To Start?
 				case SC_MONITORPOWER: // Monitor Trying To Enter Powersave?
 				return 0;             // Prevent From Happening
 			}
+			break;
+
+			// LJ DEBUG
+			// MessageBoxA(NULL, "WM_SYSCOMMAND", "Warning", MB_ICONWARNING | MB_OK);
+
+		case WM_ENTERSIZEMOVE:
+			// Inform ofApp of window resize start
+			pThis->MenuFunction("WM_ENTERSIZEMOVE", true);
+			break;
+
+		case WM_EXITSIZEMOVE:
+			// Inform ofApp of window resize exit
+			pThis->MenuFunction("WM_EXITSIZEMOVE", true);
 			break;
 
 		case WM_ENTERMENULOOP:
@@ -449,6 +522,11 @@ LRESULT CALLBACK ofxWinMenuWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		case WM_EXITMENULOOP :
 			// Inform ofApp of menu exit
 			pThis->MenuFunction("WM_EXITMENULOOP", true);
+			break;
+
+		case WM_NCLBUTTONDOWN :
+			// Inform ofApp of non client mouse press
+			pThis->MenuFunction("WM_NCLBUTTONDOWN", true);
 			break;
 
 		case WM_COMMAND:
