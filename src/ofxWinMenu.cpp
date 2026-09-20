@@ -43,6 +43,11 @@
 	12.06.26 - Load - Load item states 
 			   Test for tmp returned by GetPrivateProfileString
 	31.07.26 - Add GetEnabled(std::string ItemName)
+	18.09.26 - Handle case WM_HOTKEY in the menu callback function
+			   Pass back "WM_HOTKEY|" + std::to_string(wParam) as the title
+			   The application extracts the hot key number as follows
+			   WPARAM wParam = std::stoull(title.substr(10), nullptr, 16);
+			   Where wParam is the registered number of the hot key
 
 */
 #include "ofxWinMenu.h"
@@ -501,9 +506,6 @@ LRESULT CALLBACK ofxWinMenuWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			}
 			break;
 
-			// LJ DEBUG
-			// MessageBoxA(NULL, "WM_SYSCOMMAND", "Warning", MB_ICONWARNING | MB_OK);
-
 		case WM_ENTERSIZEMOVE:
 			// Inform ofApp of window resize start
 			pThis->MenuFunction("WM_ENTERSIZEMOVE", true);
@@ -550,6 +552,12 @@ LRESULT CALLBACK ofxWinMenuWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			// Inform ofApp of the menu item title and new state
 			pThis->MenuFunction(title, pThis->isChecked.at(wmId));
 
+			break;
+
+		// If the application has registered hot keys
+		// Send back WM_HOTKEY plus wParam which is the key code
+		case WM_HOTKEY:
+			pThis->MenuFunction("WM_HOTKEY|" + std::to_string(wParam), true);
 			break;
 
 		case WM_CLOSE: {         // Close Message
